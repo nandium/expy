@@ -8,28 +8,6 @@ An Excel formula to Python code transpiler, written in Rust and compiled to WebA
 > 
 > It is currently not in a working state, but is actively being developed. Subscribe to see updates
 
-<details open>
-
-<summary><strong>Table of Contents</strong></summary>
-
-- [Expy](#expy)
-  - [Overview](#overview)
-    - [Features](#features)
-    - [Supported Excel Functions](#supported-excel-functions)
-  - [Installation](#installation)
-    - [Pre-built Binaries](#pre-built-binaries)
-    - [From Source](#from-source)
-  - [Usage](#usage)
-    - [Browser](#browser)
-    - [As a Rust Library](#as-a-rust-library)
-  - [Development](#development)
-    - [Requirements](#requirements)
-    - [Building](#building)
-    - [Testing](#testing)
-    - [Build Targets](#build-targets)
-  - [License](#license)
-
-</details>
 
 ## Overview
 
