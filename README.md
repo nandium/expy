@@ -100,10 +100,12 @@ git clone https://github.com/nandium/expy.git
 cd expy
 ```
 
-Install `wasm-pack` (if not already installed):
+The Rust toolchain will be installed automatically via `rust-toolchain.toml` when you run any `cargo` command.
+
+Install `wasm-pack=0.13.1` (if not already installed):
 
 ```bash
-cargo install wasm-pack
+cargo install wasm-pack --version 0.13.1 --locked
 ```
 
 Build the WebAssembly package:

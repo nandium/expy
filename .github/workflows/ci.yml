@@ -8,135 +8,71 @@ on:
 
 env:
   CARGO_TERM_COLOR: always
-  RUST_BACKTRACE: 1
+  WASM_PACK_VERSION: "0.13.1"
 
 jobs:
   fmt:
     name: Format
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          components: rustfmt
-
-      - name: Check formatting
-        run: cargo fmt --all -- --check
+          toolchain-file: rust-toolchain.toml
+      - run: cargo fmt --all -- --check
 
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
+    needs: [fmt]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          components: clippy
-
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-clippy-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-clippy-
-
-      - name: Run Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
+          toolchain-file: rust-toolchain.toml
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo clippy --locked --all-targets --all-features -- -D warnings
 
   test-native:
     name: Test (Native)
     runs-on: ubuntu-latest
+    needs: [fmt]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
-
-      - name: Cache cargo registry
-        uses: actions/cache@v4
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-test-
-
-      - name: Run tests
-        run: cargo test --verbose
+          toolchain-file: rust-toolchain.toml
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo test --locked --verbose
 
   test-wasm:
     name: Test (WASM)
     runs-on: ubuntu-latest
+    needs: [fmt]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown
-
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-wasm-test-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-wasm-test-
-
-      - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-      - name: Run WASM tests (Node)
-        run: wasm-pack test --node
+          toolchain-file: rust-toolchain.toml
+      - uses: Swatinem/rust-cache@v2
+      - run: cargo install wasm-pack --version ${{ env.WASM_PACK_VERSION }} --locked
+      - run: wasm-pack test --node
 
   build-wasm:
     name: Build (WASM)
     runs-on: ubuntu-latest
-    needs: [fmt, clippy, test-native, test-wasm]
+    needs: [clippy, test-native, test-wasm]
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@stable
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
         with:
-          targets: wasm32-unknown-unknown
-
-      - name: Cache cargo registry
-        uses: actions/cache@v4
+          toolchain-file: rust-toolchain.toml
+      - uses: Swatinem/rust-cache@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-wasm-build-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-wasm-build-
-
-      - name: Install wasm-pack
-        run: curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
-
-      - name: Build WASM (release)
-        run: wasm-pack build --target web --release
-
-      - name: Upload WASM artifact
-        uses: actions/upload-artifact@v4
+          cache-all-crates: true
+      - run: cargo install wasm-pack --version ${{ env.WASM_PACK_VERSION }} --locked
+      - run: wasm-pack build --target web --release
+      - uses: actions/upload-artifact@v4
         with:
           name: wasm-pkg
           path: pkg/

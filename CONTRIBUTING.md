@@ -30,36 +30,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 ## Getting Started
 
-1. Fork the repository on GitHub
-2. Clone your fork locally:
-
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/expy.git
-   cd expy
-   ```
-
-3. Add the upstream repository as a remote:
-
-   ```bash
-   git remote add upstream https://github.com/nandium/expy.git
-   ```
-
-4. Install the required tools:
-
-   ```bash
-   # Rust toolchain (components are auto-installed via rust-toolchain.toml)
-   curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-   # wasm-pack for WebAssembly builds
-   cargo install wasm-pack
-   ```
-
-5. Verify your setup:
-
-   ```bash
-   cargo test
-   wasm-pack build --target web
-   ```
+See the [Development section](README.md#Development) for setup instructions.
 
 ## How to Contribute
 
