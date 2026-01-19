@@ -4,18 +4,25 @@ Thank you for your interest in contributing to Expy. This document provides guid
 
 ## Table of Contents
 
-- [Code of Conduct](#code-of-conduct)
-- [Getting Started](#getting-started)
-- [How to Contribute](#how-to-contribute)
-  - [Reporting Bugs](#reporting-bugs)
-  - [Suggesting Features](#suggesting-features)
-  - [Submitting Changes](#submitting-changes)
-- [Development Workflow](#development-workflow)
-- [Style Guidelines](#style-guidelines)
-  - [Rust Code Style](#rust-code-style)
-  - [Commit Messages](#commit-messages)
-- [Testing](#testing)
-- [Review Process](#review-process)
+- [Contributing to Expy](#contributing-to-expy)
+  - [Table of Contents](#table-of-contents)
+  - [Code of Conduct](#code-of-conduct)
+  - [Getting Started](#getting-started)
+  - [How to Contribute](#how-to-contribute)
+    - [Reporting Bugs](#reporting-bugs)
+    - [Suggesting Features](#suggesting-features)
+    - [Submitting Changes](#submitting-changes)
+  - [Development Workflow](#development-workflow)
+    - [Branch Naming](#branch-naming)
+  - [Style Guidelines](#style-guidelines)
+    - [Rust Code Style](#rust-code-style)
+    - [Commit Messages](#commit-messages)
+  - [Testing](#testing)
+    - [Running Tests](#running-tests)
+    - [Writing Tests](#writing-tests)
+    - [Test Coverage](#test-coverage)
+  - [Review Process](#review-process)
+  - [Questions](#questions)
 
 ## Code of Conduct
 
@@ -154,17 +161,6 @@ Examples:
 - `feature/support-sumif-function`
 - `fix/nested-parentheses-parsing`
 - `docs/update-installation-guide`
-
-### Keeping Your Fork Updated
-
-Regularly sync your fork with the upstream repository:
-
-```bash
-git checkout main
-git fetch upstream
-git merge upstream/main
-git push origin main
-```
 
 ## Style Guidelines
 
