@@ -2,7 +2,7 @@
 
 This document tracks the implementation and test coverage of the Excel formula lexer based on the specification.
 
-## Token Types - Implementation Status
+## Token Types in "Table I. Lexical tokens used in the grammar"
 
 - **BOOL** - Boolean literal `TRUE | FALSE`
 
@@ -14,13 +14,7 @@ This document tracks the implementation and test coverage of the Excel formula l
 
 - **ERROR-REF** - Reference error literal `#REF!`
 
-- **Array Delimiters**
-
-- **Unary Operators**
-
-- **Array Construction**
-
-## To be implemented
+### To be implemented
 
 - **CELL** - Cell reference `$? [A-Z]+ $? [1-9][0-9]*`
   - [ ] Simple cell reference (e.g., A1)
@@ -89,6 +83,14 @@ This document tracks the implementation and test coverage of the Excel formula l
 - **UDF** - User Defined Function `(_xll\.)? [A-Z_\][A-Z0-9_\\.★1]* \(`
   - [ ] Simple UDFs
   - [ ] XLL functions
+
+## Other Token Types
+
+- **Array Delimiters**
+
+- **Unary Operators**
+
+### To be implemented
 
 - **Binary Operators**
   - [ ] `+` (addition)
