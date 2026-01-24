@@ -10,7 +10,7 @@ use expy::bindings::token::TokenKind;
 fn test_string_empty() {
     let mut lexer = Lexer::new(r#""""#);
     let tokens = lexer.tokenize();
-    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == ""));
+    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s.is_empty()));
 }
 
 #[test]
