@@ -6,7 +6,7 @@ pub enum TokenKind {
     String(String),
     Bool(bool),
     Error(String),
-    ErrorRef,  // #REF! - separate from other errors per spec
+    ErrorRef, // #REF! - separate from other errors per spec
 
     // Operators
     Plus,
