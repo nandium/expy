@@ -82,13 +82,16 @@ impl Lexer {
         while let Some(c) = self.current() {
             if c == '"' {
                 // Check for escaped quote ""
-                if self.peek(1) == Some('"') {
-                    result.push('"');
-                    self.advance(); // skip first "
-                    self.advance(); // skip second "
-                } else {
-                    self.advance(); // skip closing "
-                    break;
+                match self.peek(1)  {
+                    Some('"') => {
+                        result.push('"');
+                        self.advance(); // skip first "
+                        self.advance(); // skip second "
+                    },
+                    _ => {
+                        self.advance(); // skip closing "
+                        break;
+                    }
                 }
             } else {
                 result.push(c);
