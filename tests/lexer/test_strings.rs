@@ -1,5 +1,5 @@
 use expy::bindings::lexer::Lexer;
-use expy::bindings::token::TokenKind;
+use expy::bindings::token::Token;
 
 // ============================================================================
 // SPEC: STRING - " ([^ "] | "")* "
@@ -10,56 +10,56 @@ use expy::bindings::token::TokenKind;
 fn test_string_empty() {
     let mut lexer = Lexer::new(r#""""#);
     let tokens = lexer.tokenize();
-    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s.is_empty()));
+    assert!(matches!(&tokens[0], Token::String(s) if s.is_empty()));
 }
 
 #[test]
 fn test_string_simple() {
     let mut lexer = Lexer::new(r#""hello""#);
     let tokens = lexer.tokenize();
-    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "hello"));
+    assert!(matches!(&tokens[0], Token::String(s) if s == "hello"));
 }
 
 #[test]
 fn test_string_with_spaces() {
     let mut lexer = Lexer::new(r#""hello world""#);
     let tokens = lexer.tokenize();
-    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "hello world"));
+    assert!(matches!(&tokens[0], Token::String(s) if s == "hello world"));
 }
 
 #[test]
 fn test_string_with_numbers() {
     let mut lexer = Lexer::new(r#""test123""#);
     let tokens = lexer.tokenize();
-    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "test123"));
+    assert!(matches!(&tokens[0], Token::String(s) if s == "test123"));
 }
 
 #[test]
 fn test_string_with_escaped_quote() {
     let mut lexer = Lexer::new(r#""hello""world""#);
     let tokens = lexer.tokenize();
-    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "hello\"world"));
+    assert!(matches!(&tokens[0], Token::String(s) if s == "hello\"world"));
 }
 
 #[test]
 fn test_string_with_multiple_escaped_quotes() {
     let mut lexer = Lexer::new(r#""say ""hi"" to ""bob""""#);
     let tokens = lexer.tokenize();
-    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "say \"hi\" to \"bob\""));
+    assert!(matches!(&tokens[0], Token::String(s) if s == "say \"hi\" to \"bob\""));
 }
 
 #[test]
 fn test_string_only_escaped_quotes() {
     let mut lexer = Lexer::new(r#""""""#);
     let tokens = lexer.tokenize();
-    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "\""));
+    assert!(matches!(&tokens[0], Token::String(s) if s == "\""));
 }
 
 #[test]
 fn test_string_multiple() {
     let mut lexer = Lexer::new(r#""first" "second" "third""#);
     let tokens = lexer.tokenize();
-    assert!(matches!(&tokens[0].kind, TokenKind::String(s) if s == "first"));
-    assert!(matches!(&tokens[1].kind, TokenKind::String(s) if s == "second"));
-    assert!(matches!(&tokens[2].kind, TokenKind::String(s) if s == "third"));
+    assert!(matches!(&tokens[0], Token::String(s) if s == "first"));
+    assert!(matches!(&tokens[1], Token::String(s) if s == "second"));
+    assert!(matches!(&tokens[2], Token::String(s) if s == "third"));
 }

@@ -1,6 +1,6 @@
 /// Token types for Excel formulas
 #[derive(Debug, Clone, PartialEq)]
-pub enum TokenKind {
+pub enum Token {
     // Literals
     Number(f64),
     String(String),
@@ -20,16 +20,4 @@ pub enum TokenKind {
 
     // End of input
     Eof,
-}
-
-/// A token with its kind
-#[derive(Debug, Clone, PartialEq)]
-pub struct Token {
-    pub kind: TokenKind,
-}
-
-impl Token {
-    pub fn new(kind: TokenKind) -> Self {
-        Self { kind }
-    }
 }

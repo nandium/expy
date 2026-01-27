@@ -1,4 +1,4 @@
-use super::token::{Token, TokenKind};
+use super::token::Token;
 
 pub struct Lexer {
     input: Vec<char>,
@@ -82,12 +82,12 @@ impl Lexer {
         while let Some(c) = self.current() {
             if c == '"' {
                 // Check for escaped quote ""
-                match self.peek(1)  {
+                match self.peek(1) {
                     Some('"') => {
                         result.push('"');
                         self.advance(); // skip first "
                         self.advance(); // skip second "
-                    },
+                    }
                     _ => {
                         self.advance(); // skip closing "
                         break;
@@ -135,60 +135,60 @@ impl Lexer {
         self.skip_whitespace();
 
         match self.current() {
-            None => Token::new(TokenKind::Eof),
+            None => Token::Eof,
             Some('+') => {
                 self.advance();
-                Token::new(TokenKind::Plus)
+                Token::Plus
             }
             Some('-') => {
                 self.advance();
-                Token::new(TokenKind::Minus)
+                Token::Minus
             }
             Some('{') => {
                 self.advance();
-                Token::new(TokenKind::LeftBrace)
+                Token::LeftBrace
             }
             Some('}') => {
                 self.advance();
-                Token::new(TokenKind::RightBrace)
+                Token::RightBrace
             }
             Some(',') => {
                 self.advance();
-                Token::new(TokenKind::Comma)
+                Token::Comma
             }
             Some(';') => {
                 self.advance();
-                Token::new(TokenKind::Semicolon)
+                Token::Semicolon
             }
             Some('"') => {
                 let s = self.read_string();
-                Token::new(TokenKind::String(s))
+                Token::String(s)
             }
             Some('#') => {
                 self.advance(); // Consume the '#' to prevent infinite loop
                 let err = self.read_error();
                 // Distinguish between ERROR-REF and ERROR
                 if err == "REF!" {
-                    Token::new(TokenKind::ErrorRef)
+                    Token::ErrorRef
                 } else {
-                    Token::new(TokenKind::Error(format!("#{}", err)))
+                    Token::Error(format!("#{}", err))
                 }
             }
             Some(c) if c.is_ascii_digit() => {
                 let num = self.read_number();
-                Token::new(TokenKind::Number(num))
+                Token::Number(num)
             }
             Some(c) if c.is_alphabetic() => {
                 let ident = self.read_identifier();
                 match ident.to_uppercase().as_str() {
-                    "TRUE" => Token::new(TokenKind::Bool(true)),
-                    "FALSE" => Token::new(TokenKind::Bool(false)),
-                    _ => Token::new(TokenKind::Eof), // Unknown for now
+                    "TRUE" => Token::Bool(true),
+                    "FALSE" => Token::Bool(false),
+                    _ => Token::Eof, // Unknown for now
                 }
             }
             Some(_) => {
                 self.advance();
-                Token::new(TokenKind::Eof)
+                Token::Eof
             }
         }
     }
@@ -197,7 +197,7 @@ impl Lexer {
         let mut tokens = Vec::new();
         loop {
             let token = self.next_token();
-            let is_eof = matches!(token.kind, TokenKind::Eof);
+            let is_eof = matches!(token, Token::Eof);
             tokens.push(token);
             if is_eof {
                 break;
