@@ -144,6 +144,50 @@ impl Lexer {
                 self.advance();
                 Token::Minus
             }
+            Some('*') => {
+                self.advance();
+                Token::Multiply
+            }
+            Some('/') => {
+                self.advance();
+                Token::Divide
+            }
+            Some('^') => {
+                self.advance();
+                Token::Power
+            }
+            Some('&') => {
+                self.advance();
+                Token::Concatenate
+            }
+            Some('=') => {
+                self.advance();
+                Token::Equal
+            }
+            Some('<') => {
+                self.advance();
+                match self.current() {
+                    Some('=') => {
+                        self.advance();
+                        Token::LessEqual
+                    }
+                    Some('>') => {
+                        self.advance();
+                        Token::NotEqual
+                    }
+                    _ => Token::Less,
+                }
+            }
+            Some('>') => {
+                self.advance();
+                match self.current() {
+                    Some('=') => {
+                        self.advance();
+                        Token::GreaterEqual
+                    }
+                    _ => Token::Greater,
+                }
+            }
             Some('{') => {
                 self.advance();
                 Token::LeftBrace

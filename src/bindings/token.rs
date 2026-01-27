@@ -8,9 +8,23 @@ pub enum Token {
     Error(String),
     ErrorRef, // #REF! - separate from other errors per spec
 
-    // Operators
+    // Operators - Arithmetic
     Plus,
     Minus,
+    Multiply,
+    Divide,
+    Power,
+
+    // Operators - Comparison
+    Equal,
+    NotEqual,
+    Less,
+    Greater,
+    LessEqual,
+    GreaterEqual,
+
+    // Operators - String
+    Concatenate,
 
     // Delimiters
     LeftBrace,
