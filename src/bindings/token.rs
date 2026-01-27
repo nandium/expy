@@ -1,3 +1,10 @@
+/// Lexer error types
+#[derive(Debug, Clone, PartialEq)]
+pub enum LexerError {
+    UnexpectedChar(char),
+    UnterminatedString,
+}
+
 /// Token types for Excel formulas
 #[derive(Debug, Clone, PartialEq)]
 pub enum Token {

@@ -90,21 +90,9 @@ This document tracks the implementation and test coverage of the Excel formula l
 
 - **Unary Operators**
 
-### To be implemented
-
 - **Binary Operators**
-  - [ ] `+` (addition)
-  - [ ] `-` (subtraction)
-  - [ ] `*` (multiplication)
-  - [ ] `/` (division)
-  - [ ] `^` (exponentiation)
-  - [ ] `&` (concatenation)
-  - [ ] `<` (less than)
-  - [ ] `>` (greater than)
-  - [ ] `=` (equals)
-  - [ ] `<=` (less than or equal)
-  - [ ] `>=` (greater than or equal)
-  - [ ] `<>` (not equal)
+
+### To be implemented
 
 - **Other Delimiters**
   - [ ] `(` (left parenthesis)

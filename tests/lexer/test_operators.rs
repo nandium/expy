@@ -8,14 +8,14 @@ use expy::bindings::token::Token;
 #[test]
 fn test_unary_plus() {
     let mut lexer = Lexer::new("+");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Plus));
 }
 
 #[test]
 fn test_unary_plus_with_number() {
     let mut lexer = Lexer::new("+4.0");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Plus));
     assert!(matches!(tokens[1], Token::Number(4.0)));
 }
@@ -23,14 +23,14 @@ fn test_unary_plus_with_number() {
 #[test]
 fn test_unary_minus() {
     let mut lexer = Lexer::new("-");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Minus));
 }
 
 #[test]
 fn test_unary_minus_with_number() {
     let mut lexer = Lexer::new("-4.0");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Minus));
     assert!(matches!(tokens[1], Token::Number(4.0)));
 }
@@ -38,7 +38,7 @@ fn test_unary_minus_with_number() {
 #[test]
 fn test_unary_operators_both() {
     let mut lexer = Lexer::new("+ -");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Plus));
     assert!(matches!(tokens[1], Token::Minus));
 }
@@ -52,28 +52,28 @@ fn test_unary_operators_both() {
 #[test]
 fn test_binary_multiply() {
     let mut lexer = Lexer::new("*");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Multiply));
 }
 
 #[test]
 fn test_binary_divide() {
     let mut lexer = Lexer::new("/");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Divide));
 }
 
 #[test]
 fn test_binary_power() {
     let mut lexer = Lexer::new("^");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Power));
 }
 
 #[test]
 fn test_binary_arithmetic_expression() {
     let mut lexer = Lexer::new("1 + 2 * 3 / 4 - 5 ^ 6");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Number(n) if n == 1.0));
     assert!(matches!(tokens[1], Token::Plus));
     assert!(matches!(tokens[2], Token::Number(n) if n == 2.0));
@@ -91,14 +91,14 @@ fn test_binary_arithmetic_expression() {
 #[test]
 fn test_binary_concatenate() {
     let mut lexer = Lexer::new("&");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Concatenate));
 }
 
 #[test]
 fn test_binary_concatenate_strings() {
     let mut lexer = Lexer::new(r#""hello" & "world""#);
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(&tokens[0], Token::String(s) if s == "hello"));
     assert!(matches!(tokens[1], Token::Concatenate));
     assert!(matches!(&tokens[2], Token::String(s) if s == "world"));
@@ -108,21 +108,21 @@ fn test_binary_concatenate_strings() {
 #[test]
 fn test_binary_equal() {
     let mut lexer = Lexer::new("=");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Equal));
 }
 
 #[test]
 fn test_binary_less() {
     let mut lexer = Lexer::new("<");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Less));
 }
 
 #[test]
 fn test_binary_greater() {
     let mut lexer = Lexer::new(">");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Greater));
 }
 
@@ -130,28 +130,28 @@ fn test_binary_greater() {
 #[test]
 fn test_binary_less_equal() {
     let mut lexer = Lexer::new("<=");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LessEqual));
 }
 
 #[test]
 fn test_binary_greater_equal() {
     let mut lexer = Lexer::new(">=");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::GreaterEqual));
 }
 
 #[test]
 fn test_binary_not_equal() {
     let mut lexer = Lexer::new("<>");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::NotEqual));
 }
 
 #[test]
 fn test_binary_comparison_expression() {
     let mut lexer = Lexer::new("1 < 2 <= 3 > 4 >= 5 = 6 <> 7");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Number(n) if n == 1.0));
     assert!(matches!(tokens[1], Token::Less));
     assert!(matches!(tokens[2], Token::Number(n) if n == 2.0));
@@ -171,7 +171,7 @@ fn test_binary_comparison_expression() {
 #[test]
 fn test_binary_operators_no_spaces() {
     let mut lexer = Lexer::new("1+2*3/4-5^6");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Number(n) if n == 1.0));
     assert!(matches!(tokens[1], Token::Plus));
     assert!(matches!(tokens[2], Token::Number(n) if n == 2.0));
@@ -188,7 +188,7 @@ fn test_binary_operators_no_spaces() {
 #[test]
 fn test_binary_all_operators() {
     let mut lexer = Lexer::new("+ - * / ^ & = < > <= >= <>");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Plus));
     assert!(matches!(tokens[1], Token::Minus));
     assert!(matches!(tokens[2], Token::Multiply));

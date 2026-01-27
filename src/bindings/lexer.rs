@@ -1,4 +1,4 @@
-use super::token::Token;
+use super::token::{LexerError, Token};
 
 pub struct Lexer {
     input: Vec<char>,
@@ -75,7 +75,7 @@ impl Lexer {
         num_str.parse().unwrap_or(0.0)
     }
 
-    fn read_string(&mut self) -> String {
+    fn read_string(&mut self) -> Result<String, LexerError> {
         self.advance(); // skip opening "
         let mut result = String::new();
 
@@ -90,7 +90,7 @@ impl Lexer {
                     }
                     _ => {
                         self.advance(); // skip closing "
-                        break;
+                        return Ok(result);
                     }
                 }
             } else {
@@ -99,7 +99,8 @@ impl Lexer {
             }
         }
 
-        result
+        // If we reach here, the string was not terminated
+        Err(LexerError::UnterminatedString)
     }
 
     fn read_error(&mut self) -> String {
@@ -131,51 +132,51 @@ impl Lexer {
         self.input[start..self.position].iter().collect()
     }
 
-    pub fn next_token(&mut self) -> Token {
+    pub fn next_token(&mut self) -> Result<Token, LexerError> {
         self.skip_whitespace();
 
         match self.current() {
-            None => Token::Eof,
+            None => Ok(Token::Eof),
             Some('+') => {
                 self.advance();
-                Token::Plus
+                Ok(Token::Plus)
             }
             Some('-') => {
                 self.advance();
-                Token::Minus
+                Ok(Token::Minus)
             }
             Some('*') => {
                 self.advance();
-                Token::Multiply
+                Ok(Token::Multiply)
             }
             Some('/') => {
                 self.advance();
-                Token::Divide
+                Ok(Token::Divide)
             }
             Some('^') => {
                 self.advance();
-                Token::Power
+                Ok(Token::Power)
             }
             Some('&') => {
                 self.advance();
-                Token::Concatenate
+                Ok(Token::Concatenate)
             }
             Some('=') => {
                 self.advance();
-                Token::Equal
+                Ok(Token::Equal)
             }
             Some('<') => {
                 self.advance();
                 match self.current() {
                     Some('=') => {
                         self.advance();
-                        Token::LessEqual
+                        Ok(Token::LessEqual)
                     }
                     Some('>') => {
                         self.advance();
-                        Token::NotEqual
+                        Ok(Token::NotEqual)
                     }
-                    _ => Token::Less,
+                    _ => Ok(Token::Less),
                 }
             }
             Some('>') => {
@@ -183,70 +184,67 @@ impl Lexer {
                 match self.current() {
                     Some('=') => {
                         self.advance();
-                        Token::GreaterEqual
+                        Ok(Token::GreaterEqual)
                     }
-                    _ => Token::Greater,
+                    _ => Ok(Token::Greater),
                 }
             }
             Some('{') => {
                 self.advance();
-                Token::LeftBrace
+                Ok(Token::LeftBrace)
             }
             Some('}') => {
                 self.advance();
-                Token::RightBrace
+                Ok(Token::RightBrace)
             }
             Some(',') => {
                 self.advance();
-                Token::Comma
+                Ok(Token::Comma)
             }
             Some(';') => {
                 self.advance();
-                Token::Semicolon
+                Ok(Token::Semicolon)
             }
             Some('"') => {
-                let s = self.read_string();
-                Token::String(s)
+                let s = self.read_string()?;
+                Ok(Token::String(s))
             }
             Some('#') => {
                 self.advance(); // Consume the '#' to prevent infinite loop
                 let err = self.read_error();
                 // Distinguish between ERROR-REF and ERROR
                 if err == "REF!" {
-                    Token::ErrorRef
+                    Ok(Token::ErrorRef)
                 } else {
-                    Token::Error(format!("#{}", err))
+                    Ok(Token::Error(format!("#{}", err)))
                 }
             }
             Some(c) if c.is_ascii_digit() => {
                 let num = self.read_number();
-                Token::Number(num)
+                Ok(Token::Number(num))
             }
             Some(c) if c.is_alphabetic() => {
                 let ident = self.read_identifier();
                 match ident.to_uppercase().as_str() {
-                    "TRUE" => Token::Bool(true),
-                    "FALSE" => Token::Bool(false),
-                    _ => Token::Eof, // Unknown for now
+                    "TRUE" => Ok(Token::Bool(true)),
+                    "FALSE" => Ok(Token::Bool(false)),
+                    _ => Err(LexerError::UnexpectedChar(c)),
                 }
             }
-            Some(_) => {
-                self.advance();
-                Token::Eof
-            }
+            Some(c) => Err(LexerError::UnexpectedChar(c)),
         }
     }
 
-    pub fn tokenize(&mut self) -> Vec<Token> {
+    pub fn tokenize(&mut self) -> Result<Vec<Token>, LexerError> {
         let mut tokens = Vec::new();
         loop {
-            let token = self.next_token();
+            let token = self.next_token()?;
             let is_eof = matches!(token, Token::Eof);
             tokens.push(token);
             if is_eof {
                 break;
             }
         }
-        tokens
+        Ok(tokens)
     }
 }

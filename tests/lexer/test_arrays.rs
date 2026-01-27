@@ -8,35 +8,35 @@ use expy::bindings::token::Token;
 #[test]
 fn test_array_left_brace() {
     let mut lexer = Lexer::new("{");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
 }
 
 #[test]
 fn test_array_right_brace() {
     let mut lexer = Lexer::new("}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::RightBrace));
 }
 
 #[test]
 fn test_array_comma() {
     let mut lexer = Lexer::new(",");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Comma));
 }
 
 #[test]
 fn test_array_semicolon() {
     let mut lexer = Lexer::new(";");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::Semicolon));
 }
 
 #[test]
 fn test_array_all_delimiters() {
     let mut lexer = Lexer::new("{ } , ;");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::RightBrace));
     assert!(matches!(tokens[2], Token::Comma));
@@ -51,7 +51,7 @@ fn test_array_all_delimiters() {
 #[test]
 fn test_array_const_numbers() {
     let mut lexer = Lexer::new("{123,45.6,7e2}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Number(n) if n == 123.0));
     assert!(matches!(tokens[2], Token::Comma));
@@ -64,7 +64,7 @@ fn test_array_const_numbers() {
 #[test]
 fn test_array_const_strings() {
     let mut lexer = Lexer::new(r#"{"a","b","c"}"#);
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(&tokens[1], Token::String(s) if s == "a"));
     assert!(matches!(tokens[2], Token::Comma));
@@ -77,7 +77,7 @@ fn test_array_const_strings() {
 #[test]
 fn test_array_const_booleans() {
     let mut lexer = Lexer::new("{TRUE,FALSE,TRUE}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Bool(true)));
     assert!(matches!(tokens[2], Token::Comma));
@@ -90,7 +90,7 @@ fn test_array_const_booleans() {
 #[test]
 fn test_array_const_errors() {
     let mut lexer = Lexer::new("{#DIV/0!,#VALUE!,#N/A}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(&tokens[1], Token::Error(e) if e == "#DIV/0!"));
     assert!(matches!(tokens[2], Token::Comma));
@@ -103,7 +103,7 @@ fn test_array_const_errors() {
 #[test]
 fn test_array_const_unary_prefix_positive() {
     let mut lexer = Lexer::new("{+1,+2.5,+3e2}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Plus));
     assert!(matches!(tokens[2], Token::Number(n) if n == 1.0));
@@ -119,7 +119,7 @@ fn test_array_const_unary_prefix_positive() {
 #[test]
 fn test_array_const_unary_prefix_negative() {
     let mut lexer = Lexer::new("{-1,-2.5,-3e2}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Minus));
     assert!(matches!(tokens[2], Token::Number(n) if n == 1.0));
@@ -135,7 +135,7 @@ fn test_array_const_unary_prefix_negative() {
 #[test]
 fn test_array_const_with_error_ref() {
     let mut lexer = Lexer::new("{1,#REF!,3}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Number(n) if n == 1.0));
     assert!(matches!(tokens[2], Token::Comma));
@@ -148,7 +148,7 @@ fn test_array_const_with_error_ref() {
 #[test]
 fn test_array_const_mixed_types() {
     let mut lexer = Lexer::new(r#"{1,"test",TRUE,#DIV/0!,+5,-3.2,#REF!}"#);
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Number(n) if n == 1.0));
     assert!(matches!(tokens[2], Token::Comma));
@@ -176,7 +176,7 @@ fn test_array_const_mixed_types() {
 #[test]
 fn test_array_single_row() {
     let mut lexer = Lexer::new("{1,2,3}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Number(n) if n == 1.0));
     assert!(matches!(tokens[2], Token::Comma));
@@ -194,7 +194,7 @@ fn test_array_single_row() {
 #[test]
 fn test_array_two_rows() {
     let mut lexer = Lexer::new("{1,2;3,4}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Number(n) if n == 1.0));
     assert!(matches!(tokens[2], Token::Comma));
@@ -209,7 +209,7 @@ fn test_array_two_rows() {
 #[test]
 fn test_array_three_rows() {
     let mut lexer = Lexer::new("{1,2;3,4;5,6}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Number(n) if n == 1.0));
     assert!(matches!(tokens[2], Token::Comma));
@@ -228,7 +228,7 @@ fn test_array_three_rows() {
 #[test]
 fn test_array_matrix_3x3() {
     let mut lexer = Lexer::new("{1,2,3;4,5,6;7,8,9}");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
 
     assert!(matches!(tokens[0], Token::LeftBrace));
     // Row 1
@@ -257,7 +257,7 @@ fn test_array_matrix_3x3() {
 #[test]
 fn test_array_with_whitespace() {
     let mut lexer = Lexer::new("{ 1 , 2 ; 3 , 4 }");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert!(matches!(tokens[0], Token::LeftBrace));
     assert!(matches!(tokens[1], Token::Number(n) if n == 1.0));
     assert!(matches!(tokens[2], Token::Comma));

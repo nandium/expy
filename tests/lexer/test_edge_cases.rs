@@ -8,7 +8,7 @@ use expy::bindings::token::Token;
 #[test]
 fn test_empty_input() {
     let mut lexer = Lexer::new("");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert_eq!(tokens.len(), 1);
     assert!(matches!(tokens[0], Token::Eof));
 }
@@ -16,7 +16,7 @@ fn test_empty_input() {
 #[test]
 fn test_whitespace_only() {
     let mut lexer = Lexer::new("   \t\n  ");
-    let tokens = lexer.tokenize();
+    let tokens = lexer.tokenize().unwrap();
     assert_eq!(tokens.len(), 1);
     assert!(matches!(tokens[0], Token::Eof));
 }
