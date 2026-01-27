@@ -1,5 +1,7 @@
 use wasm_bindgen::prelude::*;
 
+pub mod bindings;
+
 #[wasm_bindgen(start)]
 fn init() -> Result<(), JsValue> {
     // Use `web_sys`'s global `window` function to get a handle on the global
