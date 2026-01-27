@@ -35,7 +35,7 @@ impl Lexer {
         }
     }
 
-    fn read_number(&mut self) -> f64 {
+    fn read_number(&mut self) -> Result<f64, LexerError> {
         let start = self.position;
 
         // Read integer part: [0-9]+
@@ -72,7 +72,9 @@ impl Lexer {
         }
 
         let num_str: String = self.input[start..self.position].iter().collect();
-        num_str.parse().unwrap_or(0.0)
+        num_str
+            .parse()
+            .map_err(|_| LexerError::InvalidNumber(num_str))
     }
 
     fn read_string(&mut self) -> Result<String, LexerError> {
@@ -220,7 +222,7 @@ impl Lexer {
                 }
             }
             Some(c) if c.is_ascii_digit() => {
-                let num = self.read_number();
+                let num = self.read_number()?;
                 Ok(Token::Number(num))
             }
             Some(c) if c.is_alphabetic() => {

@@ -3,6 +3,7 @@
 pub enum LexerError {
     UnexpectedChar(char),
     UnterminatedString,
+    InvalidNumber(String),
 }
 
 /// Token types for Excel formulas
