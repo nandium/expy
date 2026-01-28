@@ -56,3 +56,19 @@ fn test_horizontal_range_in_expression() {
     assert!(matches!(tokens[1], Token::Plus));
     assert!(matches!(&tokens[2], Token::HorizontalRange(s) if s == "10:15"));
 }
+
+#[test]
+fn test_horizontal_range_invalid_only_dollar_after_colon() {
+    // 1:$ should error ($ alone is not valid)
+    let mut lexer = Lexer::new("1:$");
+    let result = lexer.tokenize();
+    assert!(result.is_err(), "1:$ should error but got: {:?}", result);
+}
+
+#[test]
+fn test_horizontal_range_invalid_letters_after_colon() {
+    // 1:A should error (A is not a horizontal range)
+    let mut lexer = Lexer::new("1:A");
+    let result = lexer.tokenize();
+    assert!(result.is_err(), "1:A should error but got: {:?}", result);
+}

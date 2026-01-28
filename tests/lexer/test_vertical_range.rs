@@ -56,3 +56,19 @@ fn test_vertical_range_in_expression() {
     assert!(matches!(tokens[1], Token::Plus));
     assert!(matches!(&tokens[2], Token::VerticalRange(s) if s == "D:F"));
 }
+
+#[test]
+fn test_vertical_range_invalid_missing_second_column() {
+    // A: with nothing after should error (not a valid vertical range)
+    let mut lexer = Lexer::new("A:");
+    let result = lexer.tokenize();
+    assert!(result.is_err(), "A: should error but got: {:?}", result);
+}
+
+#[test]
+fn test_vertical_range_invalid_only_dollar_after_colon() {
+    // A:$ should error ($ alone is not a column)
+    let mut lexer = Lexer::new("A:$");
+    let result = lexer.tokenize();
+    assert!(result.is_err(), "A:$ should error but got: {:?}", result);
+}
