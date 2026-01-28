@@ -82,3 +82,20 @@ fn test_cell_not_starting_with_zero() {
     // Should fail - "A" is not recognized as cell (0 invalid row) or identifier
     assert!(result.is_err());
 }
+
+#[test]
+fn test_cell_row_zero_variations() {
+    // Test various forms of invalid row 0
+    let test_cases = vec!["A0", "B0", "$A0", "A$0", "$A$0", "AA0", "XFD0"];
+
+    for input in test_cases {
+        let mut lexer = Lexer::new(input);
+        let result = lexer.tokenize();
+        assert!(
+            result.is_err(),
+            "Input '{}' should error (row 0 is invalid) but got: {:?}",
+            input,
+            result
+        );
+    }
+}
