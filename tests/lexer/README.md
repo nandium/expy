@@ -14,14 +14,13 @@ This document tracks the implementation and test coverage of the Excel formula l
 
 - **ERROR-REF** - Reference error literal `#REF!`
 
-### To be implemented
-
 - **CELL** - Cell reference `$? [A-Z]+ $? [1-9][0-9]*`
-  - [ ] Simple cell reference (e.g., A1)
-  - [ ] Absolute row (e.g., A$1)
-  - [ ] Absolute column (e.g., $A1)
-  - [ ] Fully absolute (e.g., $A$1)
-  - [ ] Multi-letter columns (e.g., AA1, ZZ100)
+
+- **HORIZONTAL-RANGE** - Range of rows `$? [0-9]+ : $? [0-9]+`
+
+- **VERTICAL-RANGE** - Range of columns `$? [A-Z]+ : $? [A-Z]+`
+
+### To be implemented
 
 - **DDECALL** - Dynamic Data Exchange link `' ([^ '] | ")+ '`
   - [ ] Basic DDE calls
@@ -33,14 +32,6 @@ This document tracks the implementation and test coverage of the Excel formula l
 
 - **FILE** - External file reference `\[ [0-9]+ \]`
   - [ ] File references
-
-- **HORIZONTAL-RANGE** - Range of rows `$? [0-9]+ : $? [0-9]+`
-  - [ ] Simple row range (e.g., 1:5)
-  - [ ] Absolute row ranges
-
-- **VERTICAL-RANGE** - Range of columns `$? [A-Z]+ : $? [A-Z]+`
-  - [ ] Simple column range (e.g., A:C)
-  - [ ] Absolute column ranges
 
 - **NR** - Named range `[A-Z_\\★1][★4]*`
   - [ ] Simple named ranges
