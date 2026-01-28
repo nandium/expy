@@ -1,0 +1,84 @@
+use expy::bindings::lexer::Lexer;
+use expy::bindings::token::Token;
+
+// ============================================================================
+// SPEC: CELL - $?[A-Z]+$?[1-9][0-9]*
+// Priority: 2
+// ============================================================================
+
+#[test]
+fn test_cell_simple() {
+    let mut lexer = Lexer::new("A1");
+    let tokens = lexer.tokenize().unwrap();
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "A1"));
+}
+
+#[test]
+fn test_cell_double_letter() {
+    let mut lexer = Lexer::new("AA10");
+    let tokens = lexer.tokenize().unwrap();
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "AA10"));
+}
+
+#[test]
+fn test_cell_triple_letter() {
+    let mut lexer = Lexer::new("XFD1048576");
+    let tokens = lexer.tokenize().unwrap();
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "XFD1048576"));
+}
+
+#[test]
+fn test_cell_absolute_column() {
+    let mut lexer = Lexer::new("$A1");
+    let tokens = lexer.tokenize().unwrap();
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "$A1"));
+}
+
+#[test]
+fn test_cell_absolute_row() {
+    let mut lexer = Lexer::new("A$1");
+    let tokens = lexer.tokenize().unwrap();
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "A$1"));
+}
+
+#[test]
+fn test_cell_absolute_both() {
+    let mut lexer = Lexer::new("$A$1");
+    let tokens = lexer.tokenize().unwrap();
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "$A$1"));
+}
+
+#[test]
+fn test_cell_large_row() {
+    let mut lexer = Lexer::new("B999");
+    let tokens = lexer.tokenize().unwrap();
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "B999"));
+}
+
+#[test]
+fn test_cell_multiple() {
+    let mut lexer = Lexer::new("A1 B2 $C$3");
+    let tokens = lexer.tokenize().unwrap();
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "A1"));
+    assert!(matches!(&tokens[1], Token::Cell(s) if s == "B2"));
+    assert!(matches!(&tokens[2], Token::Cell(s) if s == "$C$3"));
+}
+
+#[test]
+fn test_cell_in_expression() {
+    let mut lexer = Lexer::new("A1 + B2");
+    let tokens = lexer.tokenize().unwrap();
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "A1"));
+    assert!(matches!(tokens[1], Token::Plus));
+    assert!(matches!(&tokens[2], Token::Cell(s) if s == "B2"));
+}
+
+#[test]
+fn test_cell_not_starting_with_zero() {
+    // Row numbers cannot start with 0, so A0 is invalid
+    // "A" alone is not a valid token (not TRUE/FALSE)
+    let mut lexer = Lexer::new("A0");
+    let result = lexer.tokenize();
+    // Should fail - "A" is not recognized as cell (0 invalid row) or identifier
+    assert!(result.is_err());
+}
