@@ -5,7 +5,6 @@ use expy::bindings::token::Token;
 // Complex Cases
 // ============================================================================
 
-
 #[test]
 fn test_cell_followed_by_operators() {
     let mut lexer = Lexer::new("A1+B2*C3");
