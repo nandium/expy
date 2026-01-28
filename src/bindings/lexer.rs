@@ -231,7 +231,7 @@ impl Lexer {
     }
 
     // Try to read a horizontal range: $?[0-9]+:$?[0-9]+
-    fn try_read_horizontal_range(&mut self) -> Option<String> {
+    fn try_read_horizontal_range(&mut self) -> Option<Token> {
         self.backtrack_if_needed(|lexer| {
             // Read first row number
             let row1_start = lexer.position;
@@ -287,7 +287,7 @@ impl Lexer {
             }
 
             let row2: String = lexer.input[row2_start..lexer.position].iter().collect();
-            Some(format!("{}:{}", row1, row2))
+            Some(Token::HorizontalRange(format!("{}:{}", row1, row2)))
         })
     }
 
@@ -384,8 +384,8 @@ impl Lexer {
             }
             Some(c) if c.is_ascii_digit() => {
                 // Try horizontal range first (e.g., 1:10)
-                if let Some(range) = self.try_read_horizontal_range() {
-                    Ok(Token::HorizontalRange(range))
+                if let Some(token) = self.try_read_horizontal_range() {
+                    Ok(token)
                 } else {
                     // Otherwise it's a number
                     let num = self.read_number()?;
@@ -397,8 +397,8 @@ impl Lexer {
                 // Try cell/vertical range first
                 if let Some(token) = self.try_read_cell_or_vertical_range() {
                     Ok(token)
-                } else if let Some(range) = self.try_read_horizontal_range() {
-                    Ok(Token::HorizontalRange(range))
+                } else if let Some(token) = self.try_read_horizontal_range() {
+                    Ok(token)
                 } else {
                     // Invalid $ usage
                     let c = self.current().unwrap_or('$');
