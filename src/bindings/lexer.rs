@@ -7,7 +7,7 @@ pub struct Lexer {
 
 impl Lexer {
     /// Saves position, runs closure, restores position only if closure returns None
-    fn try_with_rollback_position<F, T>(&mut self, f: F) -> Option<T>
+    fn backtrack_if_needed<F, T>(&mut self, f: F) -> Option<T>
     where
         F: FnOnce(&mut Self) -> Option<T>,
     {
@@ -195,7 +195,7 @@ impl Lexer {
 
     // Try to read a cell reference or vertical range starting with column letters
     fn try_read_cell_or_vertical_range(&mut self) -> Option<Token> {
-        self.try_with_rollback_position(|lexer| {
+        self.backtrack_if_needed(|lexer| {
             let col1 = lexer.read_column();
 
             // Must have at least one letter (not just $)
@@ -232,7 +232,7 @@ impl Lexer {
 
     // Try to read a horizontal range: $?[0-9]+:$?[0-9]+
     fn try_read_horizontal_range(&mut self) -> Option<String> {
-        self.try_with_rollback_position(|lexer| {
+        self.backtrack_if_needed(|lexer| {
             // Read first row number
             let row1_start = lexer.position;
             if lexer.current() == Some('$') {
