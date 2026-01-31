@@ -62,26 +62,17 @@ fn test_precedence_lookahead_with_dollar_sign() {
     // "$1:$10" is HorizontalRange (longer match with $ prefix)
     let mut lexer = Lexer::new("$1:$10");
     let tokens = lexer.tokenize().unwrap();
-    assert!(
-        matches!(&tokens[0], Token::HorizontalRange(s) if s == "$1:$10"),
-        "Expected HorizontalRange with $ prefix"
-    );
+    assert!(matches!(&tokens[0], Token::HorizontalRange(s) if s == "$1:$10"));
 
     // "$A$1" is Cell (not vertical range - no colon)
     let mut lexer = Lexer::new("$A$1");
     let tokens = lexer.tokenize().unwrap();
-    assert!(
-        matches!(&tokens[0], Token::Cell(s) if s == "$A$1"),
-        "Expected Cell with $ prefix"
-    );
+    assert!(matches!(&tokens[0], Token::Cell(s) if s == "$A$1"));
 
     // "$A:$Z" is VerticalRange
     let mut lexer = Lexer::new("$A:$Z");
     let tokens = lexer.tokenize().unwrap();
-    assert!(
-        matches!(&tokens[0], Token::VerticalRange(s) if s == "$A:$Z"),
-        "Expected VerticalRange with $ prefix"
-    );
+    assert!(matches!(&tokens[0], Token::VerticalRange(s) if s == "$A:$Z"));
 }
 
 #[test]
@@ -90,15 +81,9 @@ fn test_precedence_lookahead_prevents_incorrect_parse() {
     // "123+456" - lookahead sees "123" has no ":" so it's a number, not horizontal range
     let mut lexer = Lexer::new("123+456");
     let tokens = lexer.tokenize().unwrap();
-    assert!(
-        matches!(tokens[0], Token::Number(n) if n == 123.0),
-        "First token should be Number(123.0)"
-    );
+    assert!(matches!(tokens[0], Token::Number(n) if n == 123.0));
     assert!(matches!(tokens[1], Token::Plus));
-    assert!(
-        matches!(tokens[2], Token::Number(n) if n == 456.0),
-        "Third token should be Number(456.0)"
-    );
+    assert!(matches!(tokens[2], Token::Number(n) if n == 456.0));
 }
 
 #[test]
@@ -107,10 +92,7 @@ fn test_precedence_multichar_column_range() {
     // "AA:ZZ" is VerticalRange, not Cell
     let mut lexer = Lexer::new("AA:ZZ");
     let tokens = lexer.tokenize().unwrap();
-    assert!(
-        matches!(&tokens[0], Token::VerticalRange(s) if s == "AA:ZZ"),
-        "Expected VerticalRange for multi-character columns"
-    );
+    assert!(matches!(&tokens[0], Token::VerticalRange(s) if s == "AA:ZZ"));
 }
 
 #[test]
@@ -119,8 +101,5 @@ fn test_precedence_large_number_range() {
     // "100:1000" is HorizontalRange, not Number
     let mut lexer = Lexer::new("100:1000");
     let tokens = lexer.tokenize().unwrap();
-    assert!(
-        matches!(&tokens[0], Token::HorizontalRange(s) if s == "100:1000"),
-        "Expected HorizontalRange for large numbers"
-    );
+    assert!(matches!(&tokens[0], Token::HorizontalRange(s) if s == "100:1000"));
 }
