@@ -9,6 +9,7 @@ mod lexer {
     mod test_lexer_errors;
     mod test_numbers;
     mod test_operators;
+    mod test_precedence;
     mod test_strings;
     mod test_vertical_range;
 }
