@@ -6,19 +6,6 @@ pub struct Lexer {
 }
 
 impl Lexer {
-    /// Saves position, runs closure, restores position only if closure returns None
-    fn backtrack_if_needed<F, T>(&mut self, f: F) -> Option<T>
-    where
-        F: FnOnce(&mut Self) -> Option<T>,
-    {
-        let saved = self.position;
-        let result = f(self);
-        if result.is_none() {
-            self.position = saved;
-        }
-        result
-    }
-
     pub fn new(input: &str) -> Self {
         Self {
             input: input.chars().collect(),
@@ -195,100 +182,102 @@ impl Lexer {
 
     // Try to read a cell reference or vertical range starting with column letters
     fn try_read_cell_or_vertical_range(&mut self) -> Option<Token> {
-        self.backtrack_if_needed(|lexer| {
-            let col1 = lexer.read_column();
+        let start = self.position;
+        let mut peek_pos = self.position;
 
-            // Must have at least one letter (not just $)
-            let has_letters = col1.chars().any(|c| c.is_ascii_uppercase());
-            if !has_letters {
+        // Peek: scan column part ($?[A-Z]+) without consuming
+        if self.input.get(peek_pos) == Some(&'$') {
+            peek_pos += 1;
+        }
+        let col_start = peek_pos;
+        while matches!(self.input.get(peek_pos), Some(c) if c.is_ascii_uppercase()) {
+            peek_pos += 1;
+        }
+        if peek_pos == col_start {
+            // No letters found
+            return None;
+        }
+
+        match self.input.get(peek_pos) {
+
+            // VERTICAL RANGE has precedence over cell
+            Some(':') => {
+                let mut after_colon = peek_pos + 1;
+                if self.input.get(after_colon) == Some(&'$') {
+                    after_colon += 1;
+                }
+                let col2_start = after_colon;
+                while matches!(self.input.get(after_colon), Some(c) if c.is_ascii_uppercase()) {
+                    after_colon += 1;
+                }
+
+                if after_colon > col2_start {
+                    // Valid vertical range - consume it
+                    self.position = after_colon;
+                    return Some(Token::VerticalRange(
+                        self.input[start..self.position].iter().collect(),
+                    ));
+                }
+                // Invalid pattern
                 return None;
             }
 
-            // Check if followed by ':'
-            if lexer.current() == Some(':') {
-                lexer.advance();
-                let col2 = lexer.read_column();
+            // CELL has precedence if row is valid
+            Some('$') | Some('1'..='9') => {
+                self.position = peek_pos; // Consume column
+                let col: String = self.input[start..peek_pos].iter().collect();
+                let row = self.read_row();
 
-                // Verify col2 has letters
-                let has_letters2 = col2.chars().any(|c| c.is_ascii_uppercase());
-                if has_letters2 {
-                    return Some(Token::VerticalRange(format!("{}:{}", col1, col2)));
-                } else {
-                    return None;
+                if !row.is_empty() && row.chars().any(|c| c.is_ascii_digit()) {
+                    return Some(Token::Cell(format!("{}{}", col, row)));
                 }
+                // Invalid cell, restore position
+                self.position = start;
+                return None;
             }
-
-            // Check if followed by a row number (making it a CELL)
-            if let Some('$' | '1'..='9') = lexer.current() {
-                let row = lexer.read_row();
-                if !row.is_empty() && row.chars().any(|ch| ch.is_ascii_digit()) {
-                    return Some(Token::Cell(format!("{}{}", col1, row)));
-                }
-            }
-
-            None
-        })
+            _ => None, // Not a cell or range
+        }
     }
 
     // Try to read a horizontal range: $?[0-9]+:$?[0-9]+
     fn try_read_horizontal_range(&mut self) -> Option<Token> {
-        self.backtrack_if_needed(|lexer| {
-            // Read first row number
-            let row1_start = lexer.position;
-            if lexer.current() == Some('$') {
-                lexer.advance();
-            }
+        let start = self.position;
+        let mut peek_pos = self.position;
 
-            // Must start with a digit
-            if let Some(c) = lexer.current() {
-                if !c.is_ascii_digit() {
-                    return None;
-                }
-            } else {
-                return None;
-            }
+        // Peek first row number ($?[0-9]+) without consuming
+        if self.input.get(peek_pos) == Some(&'$') {
+            peek_pos += 1;
+        }
+        if !matches!(self.input.get(peek_pos), Some(c) if c.is_ascii_digit()) {
+            return None;
+        }
+        while matches!(self.input.get(peek_pos), Some(c) if c.is_ascii_digit()) {
+            peek_pos += 1;
+        }
 
-            while let Some(c) = lexer.current() {
-                if c.is_ascii_digit() {
-                    lexer.advance();
-                } else {
-                    break;
-                }
-            }
+        // Lookahead: check for ':' (required for horizontal range)
+        if self.input.get(peek_pos) != Some(&':') {
+            return None; // Not a horizontal range, let it be parsed as number
+        }
+        peek_pos += 1; // Skip ':'
 
-            let row1: String = lexer.input[row1_start..lexer.position].iter().collect();
+        // Peek second row number
+        if self.input.get(peek_pos) == Some(&'$') {
+            peek_pos += 1;
+        }
+        if !matches!(self.input.get(peek_pos), Some(c) if c.is_ascii_digit()) {
+            // Invalid pattern
+            return None;
+        }
+        while matches!(self.input.get(peek_pos), Some(c) if c.is_ascii_digit()) {
+            peek_pos += 1;
+        }
 
-            // Check for ':'
-            if lexer.current() != Some(':') {
-                return None;
-            }
-            lexer.advance();
-
-            // Read second row number
-            let row2_start = lexer.position;
-            if lexer.current() == Some('$') {
-                lexer.advance();
-            }
-
-            if let Some(c) = lexer.current() {
-                if !c.is_ascii_digit() {
-                    return None;
-                }
-            } else {
-                return None;
-            }
-
-            while let Some(c) = lexer.current() {
-                if c.is_ascii_digit() {
-                    lexer.advance();
-                } else {
-                    break;
-                }
-            }
-
-            let row2: String = lexer.input[row2_start..lexer.position].iter().collect();
-            Some(Token::HorizontalRange(format!("{}:{}", row1, row2)))
-        })
+        // Valid horizontal range - consume it
+        self.position = peek_pos;
+        Some(Token::HorizontalRange(
+            self.input[start..self.position].iter().collect(),
+        ))
     }
 
     pub fn next_token(&mut self) -> Result<Token, LexerError> {
